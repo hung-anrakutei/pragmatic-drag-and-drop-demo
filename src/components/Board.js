@@ -1,7 +1,9 @@
+import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge' // NEW
 import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index' //NEW
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter'
 import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder'
 import { useCallback, useEffect, useState } from 'react'
+
 import { BOARD_COLUMNS } from '../constant'
 import Column from './Column'
 
@@ -162,6 +164,50 @@ const Board = () => {
 						location.current.dropTargets,
 						location.current.dropTargets.length
 					)
+
+					const [destinationCardRecord, destinationColumnRecord] =
+						location.current.dropTargets
+
+					const destinationColumnId =
+						destinationColumnRecord.data.columnId
+					const destinationColumn = columnsData[destinationColumnId]
+
+					const indexOfTarget = destinationColumn.cards.findIndex(
+						(card) => card.id === destinationCardRecord.data.cardId
+					)
+
+					const closestEdgeOfTarget = extractClosestEdge(
+						destinationCardRecord.data
+					)
+
+					if (sourceColumnId === destinationColumnId) {
+						const destinationIndex = getReorderDestinationIndex({
+							startIndex: draggedCardIndex,
+							indexOfTarget,
+							closestEdgeOfTarget,
+							axis: 'vertical',
+						})
+
+						reorderCard({
+							columnId: sourceColumnId,
+							startIndex: draggedCardIndex,
+							finishIndex: destinationIndex,
+						})
+
+						return
+					}
+
+					const destinationIndex =
+						closestEdgeOfTarget === 'bottom'
+							? indexOfTarget + 1
+							: indexOfTarget
+
+					moveCard({
+						movedCardIndexInSourceColumn: draggedCardIndex,
+						sourceColumnId,
+						destinationColumnId,
+						movedCardIndexInDestinationColumn: destinationIndex,
+					})
 				}
 			}
 		},

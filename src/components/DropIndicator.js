@@ -8,14 +8,7 @@ const DropIndicator = ({ edge, style }) => {
 
 	const edgeClass = edgeClassMap[edge]
 
-	return (
-		<div
-			className={`drop-indicator ${edgeClass}`}
-			style={{
-				...style,
-			}}
-		></div>
-	)
+	return <div className={`drop-indicator ${edgeClass}`} an></div>
 }
 
 export default DropIndicator
